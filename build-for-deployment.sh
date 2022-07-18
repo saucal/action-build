@@ -13,16 +13,32 @@ if [ -f 'composer.json' ]; then
 fi
 
 if [ -f 'package.json' ]; then
-	echo "--------------------------------------------------"
-	echo "List the state of node modules"
-	npm list
-	echo "--------------------------------------------------"
-	echo "Installing node dependencies"
-	npm ci
-	echo "--------------------------------------------------"
-	echo "Running node build (if present)"
-	npm run build --if-present
-	echo "--------------------------------------------------"
-	echo "Running node test (if present)"
-	npm run test --if-present
+	if [ "null" = "$(jq -cM '.workspaces' < package.json)" ]; then
+		echo "--------------------------------------------------"
+		echo "List the state of node modules"
+		npm list
+		echo "--------------------------------------------------"
+		echo "Installing node dependencies"
+		npm ci
+		echo "--------------------------------------------------"
+		echo "Running node build (if present)"
+		npm run build --if-present
+		echo "--------------------------------------------------"
+		echo "Running node test (if present)"
+		npm run test --if-present
+	else
+		echo "--------------------------------------------------"
+		echo "List the state of node modules"
+		npm list -ws
+		echo "--------------------------------------------------"
+		echo "Installing node dependencies"
+		npm install -ws
+		echo "--------------------------------------------------"
+		echo "Running node build (if present)"
+		npm run build --if-present -r
+		echo "--------------------------------------------------"
+		echo "Running node test (if present)"
+		npm run test --if-present -r
+	fi
+	
 fi
