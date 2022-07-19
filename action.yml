@@ -23,6 +23,33 @@ runs:
         echo "${{ hashFiles( '**/package.json' ) != '' }}"
         echo "${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}"
 
+    - uses: "shivammathur/setup-php@v2"
+      if: ${{ hashFiles( '**/composer.json' ) != '' }}
+      with:
+        php-version: "latest"
+
+    - name: Get composer store directory
+      if: ${{ hashFiles( '**/composer.json' ) != '' }}
+      id: composer-cache-setup
+      shell: bash
+      run: |
+        echo "::set-output name=cache_dir::$(composer global config cache-dir)"
+        echo "::set-output name=hash::${{ hashFiles( '**/composer.json', '**/composer.lock' ) }}"
+
+    - name: Cache composer
+      if: ${{ hashFiles( '**/composer.json' ) != '' }}
+      id: cache-composer
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-composer
+      with:
+        path: ${{ steps.composer-cache-setup.outputs.cache_dir }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ steps.composer-cache-setup.outputs.hash }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
     - uses: actions/setup-node@v3
       if: ${{ hashFiles( '**/package.json' ) != '' }}
       with:
