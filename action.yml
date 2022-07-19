@@ -15,6 +15,53 @@ runs:
       shell: bash
       run: echo "${{ github.action_path }}" >> $GITHUB_PATH
 
+    - name: Test
+      shell: bash
+      run: |
+        echo "${{ hashFiles( '**/package.json' ) }}"
+        echo "${{ hashFiles( '**/pnpm-lock.yaml' ) }}"
+        echo "${{ hashFiles( '**/package.json' ) != '' }}"
+        echo "${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}"
+
+    - uses: actions/setup-node@v3
+      if: ${{ hashFiles( '**/package.json' ) != '' }}
+      with:
+        node-version: 16
+
+    - uses: pnpm/action-setup@v2.0.1
+      if: ${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}
+      name: Install pnpm
+      id: pnpm-install
+      with:
+        version: 6
+
+    - name: Get npm store directory
+      if: ${{ hashFiles( '**/package.json' ) != '' }}
+      id: npm-cache-setup
+      shell: bash
+      run: |
+        if [ "${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}" == "true" ]; then
+          echo "::set-output name=cache_dir::$(pnpm store path)"
+          echo "::set-output name=hash::${{ hashFiles( '**/package.json', '**/pnpm-lock.yaml' ) }}"
+        else
+          echo "::set-output name=cache_dir::~/.npm"
+          echo "::set-output name=hash::${{ hashFiles( '**/package.json', '**/package-lock.json' ) }}"
+        fi
+
+    - name: Cache node modules
+      if: ${{ hashFiles( '**/package.json' ) != '' }}
+      id: cache-npm
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ${{ steps.npm-cache-setup.outputs.cache_dir }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ steps.npm-cache-setup.outputs.hash }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
     - name: Maybe Build And Cleanup
       shell: bash
       env:

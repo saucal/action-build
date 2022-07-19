@@ -13,7 +13,17 @@ if [ -f 'composer.json' ]; then
 fi
 
 if [ -f 'package.json' ]; then
-	if [ "null" = "$(jq -cM '.workspaces' < package.json)" ]; then
+	if [ -f 'pnpm-lock.yaml' ]; then
+		echo "--------------------------------------------------"
+		echo "Installing node dependencies"
+		pnpm recursive install --shamefully-hoist
+		echo "--------------------------------------------------"
+		echo "Running node build (if present)"
+		pnpm recursive run build --if-present
+		echo "--------------------------------------------------"
+		echo "Running node test (if present)"
+		pnpm recursive run test --if-present
+	elif [ "null" = "$(jq -cM '.workspaces' < package.json)" ]; then
 		echo "--------------------------------------------------"
 		echo "List the state of node modules"
 		npm list
