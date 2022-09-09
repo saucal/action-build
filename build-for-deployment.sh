@@ -25,9 +25,6 @@ if [ -f 'package.json' ]; then
 		pnpm recursive run test --if-present
 	elif [ "null" = "$(jq -cM '.workspaces' < package.json)" ]; then
 		echo "--------------------------------------------------"
-		echo "List the state of node modules"
-		npm list
-		echo "--------------------------------------------------"
 		echo "Installing node dependencies"
 		npm ci
 		echo "--------------------------------------------------"
@@ -37,9 +34,6 @@ if [ -f 'package.json' ]; then
 		echo "Running node test (if present)"
 		npm run test --if-present
 	else
-		echo "--------------------------------------------------"
-		echo "List the state of node modules"
-		npm list -ws
 		echo "--------------------------------------------------"
 		echo "Installing node dependencies"
 		npm install -ws
