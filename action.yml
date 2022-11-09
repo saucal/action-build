@@ -8,6 +8,11 @@ inputs:
     description: "SatisPress Key (packages.saucal.com)"
     required: false
     default: ''
+  node_version:
+    description: "The Node version for actions/setup-node"
+    required: false
+    default: '16'
+    
 runs:
   using: "composite"
   steps:
@@ -53,7 +58,7 @@ runs:
     - uses: actions/setup-node@v3
       if: ${{ hashFiles( '**/package.json' ) != '' }}
       with:
-        node-version: 16
+        node-version: ${{ inputs.node_version }}
 
     - uses: pnpm/action-setup@v2.0.1
       if: ${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}
@@ -93,4 +98,5 @@ runs:
       shell: bash
       env:
         BUILD_DIR: ${{ inputs.path }}
+        SATIS_KEY: ${{ inputs.satis_key }}
       run: maybe-build.sh
