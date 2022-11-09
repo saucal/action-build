@@ -93,4 +93,5 @@ runs:
       shell: bash
       env:
         BUILD_DIR: ${{ inputs.path }}
+        SATIS_KEY: ${{ inputs.satis_key }}
       run: maybe-build.sh
