@@ -38,8 +38,8 @@ runs:
       id: composer-cache-setup
       shell: bash
       run: |
-        echo "::set-output name=cache_dir::$(composer global config cache-dir)"
-        echo "::set-output name=hash::${{ hashFiles( '**/composer.json', '**/composer.lock' ) }}"
+        echo "{cache_dir}={$(composer global config cache-dir)}" >> $GITHUB_OUTPUT
+        echo "{hash}={${{ hashFiles( '**/composer.json', '**/composer.lock' ) }}}" >> $GITHUB_OUTPUT
 
     - name: Cache composer
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
@@ -73,11 +73,11 @@ runs:
       shell: bash
       run: |
         if [ "${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}" == "true" ]; then
-          echo "::set-output name=cache_dir::$(pnpm store path)"
-          echo "::set-output name=hash::${{ hashFiles( '**/package.json', '**/pnpm-lock.yaml' ) }}"
+          echo "{cache_dir}={$(pnpm store path)}" >> $GITHUB_OUTPUT
+          echo "{hash}={${{ hashFiles( '**/package.json', '**/pnpm-lock.yaml' ) }}}" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=cache_dir::~/.npm"
-          echo "::set-output name=hash::${{ hashFiles( '**/package.json', '**/package-lock.json' ) }}"
+          echo "{cache_dir}={~/.npm}" >> $GITHUB_OUTPUT
+          echo "{hash}={${{ hashFiles( '**/package.json', '**/package-lock.json' ) }}}" >> $GITHUB_OUTPUT
         fi
 
     - name: Cache node modules
