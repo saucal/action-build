@@ -11,7 +11,7 @@ if [ -f 'composer.json' ]; then
 	# As we are on the deploy branch, plugins should exist. Run composer install to update dependencies as needed.
 	echo "--------------------------------------------------"
 	echo "Running composer install"
-	composer install --no-dev
+	composer install --no-dev --no-autoloader
 fi
 
 if [ -f 'package.json' ]; then
