@@ -7,5 +7,5 @@ if [ -f "$BUILD_DIR/.github/build-for-deployment.sh" ]; then
 	bash "$BUILD_DIR/.github/build-for-deployment.sh"
 else
 	echo "Running default build script"
-	build-for-deployment.sh
+	bash "$GITHUB_ACTION_PATH/build-for-deployment.sh"
 fi

@@ -24,10 +24,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Path Setup
-      shell: bash
-      run: echo "${{ github.action_path }}" >> $GITHUB_PATH
-
     - uses: "shivammathur/setup-php@v2"
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
       with:
@@ -100,4 +96,4 @@ runs:
       env:
         BUILD_DIR: ${{ inputs.path }}
         SATIS_KEY: ${{ inputs.satis_key }}
-      run: maybe-build.sh
+      run: "${{ github.action_path }}/maybe-build.sh"
