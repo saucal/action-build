@@ -12,6 +12,14 @@ inputs:
     description: "The Node version for actions/setup-node"
     required: false
     default: '16'
+  php_version:
+    description: "The PHP version for actions/setup-php"
+    required: false
+    default: 'latest'
+  composer_version:
+    description: "The Composer version for actions/setup-php"
+    required: false
+    default: 'v2'
     
 runs:
   using: "composite"
@@ -23,7 +31,8 @@ runs:
     - uses: "shivammathur/setup-php@v2"
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
       with:
-        php-version: "latest"
+        php-version: "${{ inputs.php_version }}"
+        tools: "composer:${{ inputs.composer_version }}"
 
     - name: Get composer store directory
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
