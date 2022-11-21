@@ -20,14 +20,6 @@ runs:
       shell: bash
       run: echo "${{ github.action_path }}" >> $GITHUB_PATH
 
-    - name: Test
-      shell: bash
-      run: |
-        echo "${{ hashFiles( '**/package.json' ) }}"
-        echo "${{ hashFiles( '**/pnpm-lock.yaml' ) }}"
-        echo "${{ hashFiles( '**/package.json' ) != '' }}"
-        echo "${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}"
-
     - uses: "shivammathur/setup-php@v2"
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
       with:
