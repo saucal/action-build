@@ -20,6 +20,10 @@ inputs:
     description: "The Composer version for actions/setup-php"
     required: false
     default: 'v2'
+  validate-composer:
+    description: "Validate composer?"
+    required: false
+    default: 'true'
     
 runs:
   using: "composite"
@@ -29,6 +33,18 @@ runs:
       with:
         php-version: "${{ inputs.php_version }}"
         tools: "composer:${{ inputs.composer_version }}"
+
+    - name: Validate composer
+      if: ${{ hashFiles( '**/composer.json' ) != '' && inputs.validate-composer == 'true' }}
+      id: validate-composer
+      shell: bash
+      run: |
+        cd "${{ github.workspace }}/${{ inputs.path }}";
+        composer validate --strict --no-check-all --no-check-publish --check-lock
+        EXIT_CODE=$?
+        if [ $EXIT_CODE -ne 0 ]; then
+          exit $EXIT_CODE;
+        fi
 
     - name: Get composer store directory
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
