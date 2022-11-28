@@ -34,18 +34,6 @@ runs:
         php-version: "${{ inputs.php_version }}"
         tools: "composer:${{ inputs.composer_version }}"
 
-    - name: Validate composer
-      if: ${{ hashFiles( '**/composer.json' ) != '' && inputs.validate-composer == 'true' }}
-      id: validate-composer
-      shell: bash
-      run: |
-        cd "${{ github.workspace }}/${{ inputs.path }}";
-        composer validate --strict --no-check-all --no-check-publish --check-lock
-        EXIT_CODE=$?
-        if [ $EXIT_CODE -ne 0 ]; then
-          exit $EXIT_CODE;
-        fi
-
     - name: Get composer store directory
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
       id: composer-cache-setup
@@ -112,4 +100,5 @@ runs:
       env:
         BUILD_DIR: ${{ inputs.path }}
         SATIS_KEY: ${{ inputs.satis_key }}
+        VALIDATE_COMPOSER: ${{ inputs.validate-composer }}
       run: "${{ github.action_path }}/maybe-build.sh"

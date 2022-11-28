@@ -8,6 +8,16 @@ if [ -f 'composer.json' ]; then
 		echo "SatisPress key not set."
 	fi
 
+	if [ "${VALIDATE_COMPOSER}" == "true" ]; then
+		echo "--------------------------------------------------"
+		echo "Validating composer structure"
+		composer validate --strict --no-check-all --no-check-publish --check-lock
+		EXIT_CODE=$?
+		if [ $EXIT_CODE -ne 0 ]; then
+			exit $EXIT_CODE;
+		fi
+	fi
+
 	# As we are on the deploy branch, plugins should exist. Run composer install to update dependencies as needed.
 	echo "--------------------------------------------------"
 	echo "Running composer install"
