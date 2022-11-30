@@ -1,4 +1,5 @@
 #!/bin/bash -e
+set -e
 if [ -f 'composer.json' ]; then
 	echo "--------------------------------------------------"
 	echo "Setup authentication for our SatisPress instance"
