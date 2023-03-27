@@ -2,9 +2,9 @@
 # Build
 mkdir -p "${GITHUB_WORKSPACE}/${BUILD_DIR}"
 cd "${GITHUB_WORKSPACE}/${BUILD_DIR}";
-if [ -f "$BUILD_DIR/.github/build-for-deployment.sh" ]; then
+if [ -f ".github/build-for-deployment.sh" ]; then
 	echo "Running code specific build script"
-	bash "$BUILD_DIR/.github/build-for-deployment.sh"
+	bash ".github/build-for-deployment.sh"
 	EXIT_CODE=$?
 	if [ $EXIT_CODE -ne 0 ]; then
 		exit $EXIT_CODE;
