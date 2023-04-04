@@ -5,6 +5,7 @@ if [[ $BUILD_DIR != /* ]]; then
 fi
 
 mkdir -p "${BUILD_DIR}"
+cd "${BUILD_DIR}";
 
 if [ -f "${BUILD_DIR}/.github/build-for-deployment.sh" ]; then
 	echo "Running code specific build script"
