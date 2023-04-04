@@ -1,5 +1,8 @@
 #!/bin/bash -e
 set -e
+
+echo "This is build-for-deployment.sh"
+
 if [ -f 'composer.json' ]; then
 	echo "--------------------------------------------------"
 	echo "Setup authentication for our SatisPress instance"
