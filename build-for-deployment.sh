@@ -1,5 +1,6 @@
 #!/bin/bash -e
 set -e
+
 if [ -f 'composer.json' ]; then
 	echo "--------------------------------------------------"
 	echo "Setup authentication for our SatisPress instance"
@@ -23,6 +24,9 @@ if [ -f 'composer.json' ]; then
 	echo "--------------------------------------------------"
 	echo "Running composer install"
 	composer install --no-dev --no-autoloader
+else
+	echo "--------------------------------------------------"
+	echo "No composer.json found. Skipping composer install."
 fi
 
 if [ -f 'package.json' ]; then
@@ -57,5 +61,7 @@ if [ -f 'package.json' ]; then
 		echo "Running node test (if present)"
 		npm run test --if-present -r
 	fi
-	
+else
+	echo "--------------------------------------------------"
+	echo "No package.json found. Skipping node install."
 fi
