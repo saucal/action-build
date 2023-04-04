@@ -20,6 +20,8 @@ else
 	echo "Running default build script"
 	echo $GITHUB_ACTION_PATH
 	bash "$GITHUB_ACTION_PATH/build-for-deployment.sh"
+	cat "$GITHUB_ACTION_PATH/build-for-deployment.sh"
+
 	EXIT_CODE=$?
 	if [ $EXIT_CODE -ne 0 ]; then
 		exit $EXIT_CODE;
