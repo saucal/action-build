@@ -23,7 +23,15 @@ if [ -f 'composer.json' ]; then
 	# As we are on the deploy branch, plugins should exist. Run composer install to update dependencies as needed.
 	echo "--------------------------------------------------"
 	echo "Running composer install"
-	composer install --no-dev --no-autoloader
+
+	# if the type of the composer project is "plugin" then we should install the autoloader
+	if [ "plugin" = "$(composer config type)" ]; then
+		composer install --no-dev
+	else
+		echo "Not installing autoloader as the type is not set to 'plugin'"
+		composer install --no-dev --no-autoloader
+	fi
+
 else
 	echo "--------------------------------------------------"
 	echo "No composer.json found. Skipping composer install."
