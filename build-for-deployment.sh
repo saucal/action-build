@@ -23,7 +23,16 @@ if [ -f 'composer.json' ]; then
 	# As we are on the deploy branch, plugins should exist. Run composer install to update dependencies as needed.
 	echo "--------------------------------------------------"
 	echo "Running composer install"
-	composer install --no-dev --no-autoloader
+
+	# Check if the type of the composer project requires the autoloader
+	REQUIRE_AUTOLOADER="plugin theme wordpress-plugin wordpress-theme"
+	if [[ $REQUIRE_AUTOLOADER =~ $(composer config type) ]]; then
+		composer install --no-dev
+	else
+		echo "Not installing autoloader as the type is not set to any of: $REQUIRE_AUTOLOADER"
+		composer install --no-dev --no-autoloader
+	fi
+
 else
 	echo "--------------------------------------------------"
 	echo "No composer.json found. Skipping composer install."
