@@ -24,11 +24,12 @@ if [ -f 'composer.json' ]; then
 	echo "--------------------------------------------------"
 	echo "Running composer install"
 
-	# if the type of the composer project is "plugin" then we should install the autoloader
-	if [ "plugin" = "$(composer config type)" ]; then
+	# Check if the type of the composer project requires the autoloader
+	REQUIRE_AUTOLOADER="plugin theme wordpress-plugin wordpress-theme"
+	if [[ $REQUIRE_AUTOLOADER =~ $(composer config type) ]]; then
 		composer install --no-dev
 	else
-		echo "Not installing autoloader as the type is not set to 'plugin'"
+		echo "Not installing autoloader as the type is not set to any of: $REQUIRE_AUTOLOADER"
 		composer install --no-dev --no-autoloader
 	fi
 
