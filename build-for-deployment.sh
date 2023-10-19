@@ -5,7 +5,7 @@ if [ -f 'composer.json' ]; then
 	echo "--------------------------------------------------"
 	echo "Setup authentication for our SatisPress instance"
 	if [ -n "${SATIS_KEY}" ]; then
-		composer config http-basic.packages.saucal.com "${SATIS_KEY}" satispress
+		composer config http-basic.packages.saucal.com "${SATIS_KEY}" "$(composer config homepage | sed 's,http[s]\?://,,')"
 	else 
 		echo "SatisPress key not set."
 	fi
