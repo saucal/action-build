@@ -16,6 +16,10 @@ inputs:
     description: "The PHP version for actions/setup-php"
     required: false
     default: 'latest'
+  php_extensions:
+    description: "The extensions parameter for actions/setup-php"
+    required: false
+    default: 'mbstring'
   composer_version:
     description: "The Composer version for actions/setup-php"
     required: false
@@ -33,6 +37,7 @@ runs:
       with:
         php-version: "${{ inputs.php_version }}"
         tools: "composer:${{ inputs.composer_version }}"
+        extensions: "${{ inputs.php_extensions }}"
 
     - name: Get composer store directory
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
