@@ -50,7 +50,7 @@ runs:
     - name: Cache composer
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
       id: cache-composer
-      uses: actions/cache@v3
+      uses: actions/cache/restore@v4
       env:
         cache-name: cache-composer
       with:
@@ -89,7 +89,7 @@ runs:
     - name: Cache node modules
       if: ${{ hashFiles( '**/package.json' ) != '' }}
       id: cache-npm
-      uses: actions/cache@v3
+      uses: actions/cache/restore@v4
       env:
         cache-name: cache-node-modules
       with:
@@ -107,3 +107,19 @@ runs:
         SATIS_KEY: ${{ inputs.satis_key }}
         VALIDATE_COMPOSER: ${{ inputs.validate-composer }}
       run: "${{ github.action_path }}/maybe-build.sh"
+
+    - name: Save Composer Cache
+      id: cache-composer-save
+      if: steps.cache-composer.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-composer.outputs.cache-primary-key }}
+        path: ${{ steps.composer-cache-setup.outputs.cache_dir }}
+
+    - name: Save NPM Cache
+      id: cache-npm-save
+      if: steps.cache-npm.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-npm.outputs.cache-primary-key }}
+        path: ${{ steps.npm-cache-setup.outputs.cache_dir }}
