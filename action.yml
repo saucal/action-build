@@ -58,8 +58,6 @@ runs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ steps.composer-cache-setup.outputs.hash }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
 
     - uses: actions/setup-node@v3
       if: ${{ hashFiles( '**/package.json' ) != '' }}
@@ -97,8 +95,6 @@ runs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ steps.npm-cache-setup.outputs.hash }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
 
     - name: Maybe Build And Cleanup
       shell: bash
