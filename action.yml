@@ -12,6 +12,10 @@ inputs:
     description: "The Node version for actions/setup-node"
     required: false
     default: '16'
+  pnpm_version:
+    description: "The pnpm version for pnpm/action-setup"
+    required: false
+    default: '6'
   php_version:
     description: "The PHP version for actions/setup-php"
     required: false
@@ -71,7 +75,7 @@ runs:
       name: Install pnpm
       id: pnpm-install
       with:
-        version: 6
+        version: ${{ inputs.pnpm_version }}
 
     - name: Get npm store directory
       if: ${{ hashFiles( '**/package.json' ) != '' }}
