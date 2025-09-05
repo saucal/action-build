@@ -43,56 +43,26 @@ runs:
         BUILD_COMPOSER_HASH: >-
           ${{
             hashFiles(
-              'composer.json',
-              'composer.lock',
-              'plugins/*/composer.json',
-              'plugins/*/composer.lock',
-              'themes/*/composer.json',
-              'themes/*/composer.lock',
-              'mu-plugins/*/composer.json',
-              'mu-plugins/*/composer.lock',
-              'wp-content/plugins/*/composer.json',
-              'wp-content/plugins/*/composer.lock',
-              'wp-content/themes/*/composer.json',
-              'wp-content/themes/*/composer.lock',
-              'wp-content/mu-plugins/*/composer.json',
-              'wp-content/mu-plugins/*/composer.lock'
+              '**/composer.json',
+              '**/composer.lock'
             )
           }}
         BUILD_NODE_HASH: >-
           ${{
             hashFiles(
-              'package.json',
-              'plugins/*/package.json',
-              'themes/*/package.json',
-              'mu-plugins/*/package.json',
-              'wp-content/plugins/*/package.json',
-              'wp-content/themes/*/package.json',
-              'wp-content/mu-plugins/*/package.json'
+              '**/package.json'
             )
           }}
         BUILD_NPM_HASH: >-
           ${{
             hashFiles(
-              'package-lock.json',
-              'plugins/*/package-lock.json',
-              'themes/*/package-lock.json',
-              'mu-plugins/*/package-lock.json',
-              'wp-content/plugins/*/package-lock.json',
-              'wp-content/themes/*/package-lock.json',
-              'wp-content/mu-plugins/*/package-lock.json'
+              '**/package-lock.json'
             )
           }}
         BUILD_PNPM_HASH: >-
           ${{
             hashFiles(
-              'pnpm-lock.yaml',
-              'plugins/*/pnpm-lock.yaml',
-              'themes/*/pnpm-lock.yaml',
-              'mu-plugins/*/pnpm-lock.yaml',
-              'wp-content/plugins/*/pnpm-lock.yaml',
-              'wp-content/themes/*/pnpm-lock.yaml',
-              'wp-content/mu-plugins/*/pnpm-lock.yaml'
+              '**/pnpm-lock.yaml'
             )
           }}
       run: |
