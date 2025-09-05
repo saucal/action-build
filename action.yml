@@ -36,23 +36,87 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Hash Files
+      id: hash-the-files
+      shell: bash
+      env:
+        BUILD_COMPOSER_HASH: >
+          ${{
+            hashFiles(
+              '/composer.json',
+              '/composer.lock',
+              '/plugins/*/composer.json',
+              '/plugins/*/composer.lock',
+              '/themes/*/composer.json',
+              '/themes/*/composer.lock',
+              '/mu-plugins/*/composer.json',
+              '/mu-plugins/*/composer.lock',
+              '/wp-content/plugins/*/composer.json',
+              '/wp-content/plugins/*/composer.lock',
+              '/wp-content/themes/*/composer.json',
+              '/wp-content/themes/*/composer.lock',
+              '/wp-content/mu-plugins/*/composer.json',
+              '/wp-content/mu-plugins/*/composer.lock'
+            )
+          }}
+        BUILD_NODE_HASH: >
+          ${{
+            hashFiles(
+              '/package.json',
+              '/plugins/*/package.json',
+              '/themes/*/package.json',
+              '/mu-plugins/*/package.json',
+              '/wp-content/plugins/*/package.json',
+              '/wp-content/themes/*/package.json',
+              '/wp-content/mu-plugins/*/package.json'
+            )
+          }}
+        BUILD_NPM_HASH: >
+          ${{
+            hashFiles(
+              '/package-lock.json',
+              '/plugins/*/package-lock.json',
+              '/themes/*/package-lock.json',
+              '/mu-plugins/*/package-lock.json',
+              '/wp-content/plugins/*/package-lock.json',
+              '/wp-content/themes/*/package-lock.json',
+              '/wp-content/mu-plugins/*/package-lock.json'
+            )
+          }}
+        BUILD_PNPM_HASH: >
+          ${{
+            hashFiles(
+              '/pnpm-lock.yaml',
+              '/plugins/*/pnpm-lock.yaml',
+              '/themes/*/pnpm-lock.yaml',
+              '/mu-plugins/*/pnpm-lock.yaml',
+              '/wp-content/plugins/*/pnpm-lock.yaml',
+              '/wp-content/themes/*/pnpm-lock.yaml',
+              '/wp-content/mu-plugins/*/pnpm-lock.yaml'
+            )
+          }}
+      run: |
+        echo "composer_hash=$BUILD_COMPOSER_HASH" >> "$GITHUB_OUTPUT"
+        echo "node_hash=$BUILD_NODE_HASH" >> "$GITHUB_OUTPUT"
+        echo "npm_hash=$BUILD_NPM_HASH" >> "$GITHUB_OUTPUT"
+        echo "pnpm_hash=$BUILD_PNPM_HASH" >> "$GITHUB_OUTPUT"
     - uses: "shivammathur/setup-php@v2"
-      if: ${{ hashFiles( '**/composer.json' ) != '' }}
+      if: ${{ steps.hash-the-files.outputs.composer_hash != '' }}
       with:
         php-version: "${{ inputs.php_version }}"
         tools: "composer:${{ inputs.composer_version }}"
         extensions: "${{ inputs.php_extensions }}"
 
     - name: Get composer store directory
-      if: ${{ hashFiles( '**/composer.json' ) != '' }}
+      if: ${{ steps.hash-the-files.outputs.composer_hash != '' }}
       id: composer-cache-setup
       shell: bash
       run: |
         echo "cache_dir=$(composer global config cache-dir)" >> "$GITHUB_OUTPUT"
-        echo "hash=${{ hashFiles( '**/composer.json', '**/composer.lock' ) }}" >> "$GITHUB_OUTPUT"
+        echo "hash=${{ steps.hash-the-files.outputs.composer_hash }}" >> "$GITHUB_OUTPUT"
 
     - name: Cache composer
-      if: ${{ hashFiles( '**/composer.json' ) != '' }}
+      if: ${{ steps.hash-the-files.outputs.composer_hash != '' }}
       id: cache-composer
       uses: actions/cache/restore@v4
       env:
@@ -64,32 +128,32 @@ runs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
 
     - uses: actions/setup-node@v3
-      if: ${{ hashFiles( '**/package.json' ) != '' }}
+      if: ${{ steps.hash-the-files.outputs.node_hash != '' }}
       with:
         node-version: ${{ inputs.node_version }}
 
     - uses: pnpm/action-setup@v2.0.1
-      if: ${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}
+      if: ${{ steps.hash-the-files.outputs.pnpm_hash != '' }}
       name: Install pnpm
       id: pnpm-install
       with:
         version: ${{ inputs.pnpm_version }}
 
     - name: Get npm store directory
-      if: ${{ hashFiles( '**/package.json' ) != '' }}
+      if: ${{ steps.hash-the-files.outputs.node_hash != '' }}
       id: npm-cache-setup
       shell: bash
       run: |
-        if [ "${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}" == "true" ]; then
+        if [ "${{ steps.hash-the-files.outputs.pnpm_hash != '' }}" == "true" ]; then
           echo "cache_dir=$(pnpm store path)" >> "$GITHUB_OUTPUT"
-          echo "hash=${{ hashFiles( '**/package.json', '**/pnpm-lock.yaml' ) }}" >> "$GITHUB_OUTPUT"
+          echo "hash=${{ steps.hash-the-files.outputs.pnpm_hash }}" >> "$GITHUB_OUTPUT"
         else
           echo "cache_dir=~/.npm" >> "$GITHUB_OUTPUT"
-          echo "hash=${{ hashFiles( '**/package.json', '**/package-lock.json' ) }}" >> "$GITHUB_OUTPUT"
+          echo "hash=${{ steps.hash-the-files.outputs.npm_hash }}" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Cache node modules
-      if: ${{ hashFiles( '**/package.json' ) != '' }}
+      if: ${{ steps.hash-the-files.outputs.node_hash != '' }}
       id: cache-npm
       uses: actions/cache/restore@v4
       env:
