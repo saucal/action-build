@@ -40,7 +40,7 @@ runs:
       if: ${{ hashFiles( '**/composer.json' ) != '' }}
       with:
         php-version: "${{ inputs.php_version }}"
-        tools: "composer:${{ inputs.composer_version }}"
+        tools: "composer:${{ inputs.composer_version }}, wp-cli"
         extensions: "${{ inputs.php_extensions }}"
 
     - name: Get composer store directory
