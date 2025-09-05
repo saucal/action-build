@@ -40,7 +40,7 @@ runs:
       id: hash-the-files
       shell: bash
       env:
-        BUILD_COMPOSER_HASH: >
+        BUILD_COMPOSER_HASH: >-
           ${{
             hashFiles(
               'composer.json',
@@ -59,7 +59,7 @@ runs:
               'wp-content/mu-plugins/*/composer.lock'
             )
           }}
-        BUILD_NODE_HASH: >
+        BUILD_NODE_HASH: >-
           ${{
             hashFiles(
               'package.json',
@@ -71,7 +71,7 @@ runs:
               'wp-content/mu-plugins/*/package.json'
             )
           }}
-        BUILD_NPM_HASH: >
+        BUILD_NPM_HASH: >-
           ${{
             hashFiles(
               'package-lock.json',
@@ -83,7 +83,7 @@ runs:
               'wp-content/mu-plugins/*/package-lock.json'
             )
           }}
-        BUILD_PNPM_HASH: >
+        BUILD_PNPM_HASH: >-
           ${{
             hashFiles(
               'pnpm-lock.yaml',
