@@ -7,6 +7,12 @@ fi
 mkdir -p "${BUILD_DIR}"
 cd "${BUILD_DIR}";
 
+CURRENT_BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+if [ -n "$CURRENT_BRANCH_NAME" ]; then
+	echo "Current branch name: ${CURRENT_BRANCH_NAME}"
+	export COMPOSER_ROOT_VERSION="dev-${CURRENT_BRANCH_NAME}"
+fi
+
 if [ -f "${BUILD_DIR}/.github/build-for-deployment.sh" ]; then
 	echo "Running code specific build script"
 	bash "${BUILD_DIR}/.github/build-for-deployment.sh"
