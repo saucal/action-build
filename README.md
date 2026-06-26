@@ -40,4 +40,12 @@ This should be compatible with any codebase structure, but it has been tested wi
 
     # Do a validation of the composer.json and composer.lock syncronzation
     validate-composer: "true"
+
+    # Optional newline-separated list of dependency manifest paths (relative to
+    # `path`). When set, the action skips manifest discovery entirely. Supply
+    # this from an upstream prepare step to avoid scanning large repos. When
+    # empty, the action discovers manifests via `git ls-files` (index read, no
+    # filesystem walk; tracked-only so vendor/node_modules are skipped), falling
+    # back to a pruned `find` if `path` is not a git checkout.
+    manifest_list: ""
 ```

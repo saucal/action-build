@@ -32,71 +32,80 @@ inputs:
     description: "Validate composer?"
     required: false
     default: 'true'
-    
+  manifest_list:
+    description: "Optional newline-separated list of dependency manifest paths (relative to path). When set, skips manifest discovery — supply from an upstream prepare step to avoid scanning large repos."
+    required: false
+    default: ''
+
 runs:
   using: "composite"
   steps:
+    - name: Detect manifests
+      id: detect
+      shell: bash
+      env:
+        BUILD_DIR: ${{ inputs.path }}
+        MANIFEST_LIST: ${{ inputs.manifest_list }}
+      run: "${{ github.action_path }}/detect-manifests.sh"
+
     - uses: "shivammathur/setup-php@v2"
-      if: ${{ hashFiles( '**/composer.json' ) != '' }}
+      if: ${{ steps.detect.outputs.has_composer == 'true' }}
       with:
         php-version: "${{ inputs.php_version }}"
         tools: "composer:${{ inputs.composer_version }}"
         extensions: "${{ inputs.php_extensions }}"
 
     - name: Get composer store directory
-      if: ${{ hashFiles( '**/composer.json' ) != '' }}
+      if: ${{ steps.detect.outputs.has_composer == 'true' }}
       id: composer-cache-setup
       shell: bash
       run: |
         echo "cache_dir=$(composer global config cache-dir)" >> "$GITHUB_OUTPUT"
-        echo "hash=${{ hashFiles( '**/composer.json', '**/composer.lock' ) }}" >> "$GITHUB_OUTPUT"
 
     - name: Cache composer
-      if: ${{ hashFiles( '**/composer.json' ) != '' }}
+      if: ${{ steps.detect.outputs.has_composer == 'true' }}
       id: cache-composer
       uses: actions/cache/restore@v4
       env:
         cache-name: cache-composer
       with:
         path: ${{ steps.composer-cache-setup.outputs.cache_dir }}
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ steps.composer-cache-setup.outputs.hash }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ steps.detect.outputs.composer_hash }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
 
     - uses: actions/setup-node@v3
-      if: ${{ hashFiles( '**/package.json' ) != '' }}
+      if: ${{ steps.detect.outputs.has_node == 'true' }}
       with:
         node-version: ${{ inputs.node_version }}
 
     - uses: pnpm/action-setup@v2.0.1
-      if: ${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}
+      if: ${{ steps.detect.outputs.has_pnpm == 'true' }}
       name: Install pnpm
       id: pnpm-install
       with:
         version: ${{ inputs.pnpm_version }}
 
     - name: Get npm store directory
-      if: ${{ hashFiles( '**/package.json' ) != '' }}
+      if: ${{ steps.detect.outputs.has_node == 'true' }}
       id: npm-cache-setup
       shell: bash
       run: |
-        if [ "${{ hashFiles( '**/pnpm-lock.yaml' ) != '' }}" == "true" ]; then
+        if [ "${{ steps.detect.outputs.has_pnpm }}" == "true" ]; then
           echo "cache_dir=$(pnpm store path)" >> "$GITHUB_OUTPUT"
-          echo "hash=${{ hashFiles( '**/package.json', '**/pnpm-lock.yaml' ) }}" >> "$GITHUB_OUTPUT"
         else
           echo "cache_dir=~/.npm" >> "$GITHUB_OUTPUT"
-          echo "hash=${{ hashFiles( '**/package.json', '**/package-lock.json' ) }}" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Cache node modules
-      if: ${{ hashFiles( '**/package.json' ) != '' }}
+      if: ${{ steps.detect.outputs.has_node == 'true' }}
       id: cache-npm
       uses: actions/cache/restore@v4
       env:
         cache-name: cache-node-modules
       with:
         path: ${{ steps.npm-cache-setup.outputs.cache_dir }}
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ steps.npm-cache-setup.outputs.hash }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ steps.detect.outputs.node_hash }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
 
