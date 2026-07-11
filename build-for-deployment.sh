@@ -2,13 +2,8 @@
 set -e
 
 if [ -f 'composer.json' ]; then
-	echo "--------------------------------------------------"
-	echo "Setup authentication for our SatisPress instance"
-	if [ -n "${SATIS_KEY}" ]; then
-		composer config http-basic.packages.saucal.com "${SATIS_KEY}" "$(composer config homepage | sed 's,http[s]\?://,,')"
-	else 
-		echo "SatisPress key not set."
-	fi
+	# SatisPress auth is configured by the SatisPress auth step (saucal/action-composer-auth)
+	# that runs before this script.
 
 	if [ "${VALIDATE_COMPOSER}" == "true" ]; then
 		echo "--------------------------------------------------"
