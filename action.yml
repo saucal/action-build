@@ -109,6 +109,12 @@ runs:
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
 
+    - name: SatisPress auth
+      uses: saucal/action-composer-auth@v1
+      with:
+        username: ${{ inputs.satis_key }}
+        path: ${{ inputs.path }}
+
     - name: Maybe Build And Cleanup
       shell: bash
       env:
