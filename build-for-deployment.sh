@@ -40,30 +40,30 @@ if [ -f 'package.json' ]; then
 		pnpm recursive install --shamefully-hoist
 		echo "--------------------------------------------------"
 		echo "Running node build (if present)"
-		pnpm recursive run build --if-present
+		pnpm recursive run --if-present build
 		echo "--------------------------------------------------"
 		echo "Running node test (if present)"
-		pnpm recursive run test --if-present
+		pnpm recursive run --if-present test
 	elif [ "null" = "$(jq -cM '.workspaces' < package.json)" ]; then
 		echo "--------------------------------------------------"
 		echo "Installing node dependencies"
 		npm ci
 		echo "--------------------------------------------------"
 		echo "Running node build (if present)"
-		npm run build --if-present
+		npm run --if-present build
 		echo "--------------------------------------------------"
 		echo "Running node test (if present)"
-		npm run test --if-present
+		npm run --if-present test
 	else
 		echo "--------------------------------------------------"
 		echo "Installing node dependencies"
 		npm install -ws
 		echo "--------------------------------------------------"
 		echo "Running node build (if present)"
-		npm run build --if-present -r
+		npm run --if-present -r build
 		echo "--------------------------------------------------"
 		echo "Running node test (if present)"
-		npm run test --if-present -r
+		npm run --if-present -r test
 	fi
 else
 	echo "--------------------------------------------------"
