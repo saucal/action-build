@@ -9,13 +9,13 @@ inputs:
     required: false
     default: ''
   node_version:
-    description: "The Node version for actions/setup-node"
+    description: "The Node version for actions/setup-node. Empty: the repo's .nvmrc, else 22"
     required: false
-    default: '16'
+    default: ''
   pnpm_version:
-    description: "The pnpm version for pnpm/action-setup"
+    description: "The pnpm version for pnpm/action-setup. Empty: 10"
     required: false
-    default: '6'
+    default: ''
   php_version:
     description: "The PHP version for actions/setup-php"
     required: false
@@ -77,14 +77,16 @@ runs:
     - uses: actions/setup-node@v3
       if: ${{ steps.detect.outputs.has_node == 'true' }}
       with:
-        node-version: ${{ inputs.node_version }}
+        # First match wins: the input (the repo's NODE_VERSION variable), the repo's .nvmrc, 22.
+        node-version: ${{ inputs.node_version || (hashFiles(format('{0}/.nvmrc', inputs.path)) == '' && '22') || '' }}
+        node-version-file: ${{ !inputs.node_version && hashFiles(format('{0}/.nvmrc', inputs.path)) != '' && format('{0}/.nvmrc', inputs.path) || '' }}
 
     - uses: pnpm/action-setup@v2.0.1
       if: ${{ steps.detect.outputs.has_pnpm == 'true' }}
       name: Install pnpm
       id: pnpm-install
       with:
-        version: ${{ inputs.pnpm_version }}
+        version: ${{ inputs.pnpm_version || '10' }}
 
     - name: Get npm store directory
       if: ${{ steps.detect.outputs.has_node == 'true' }}
