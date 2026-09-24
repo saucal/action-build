@@ -37,13 +37,15 @@ if [ -f 'package.json' ]; then
 	if [ -f 'pnpm-lock.yaml' ]; then
 		echo "--------------------------------------------------"
 		echo "Installing node dependencies"
-		pnpm recursive install --shamefully-hoist
+		# e2e/ is the site's Playwright suite, a package of its own: never installed, built or run on
+		# deploy. Without a pnpm-workspace.yaml, pnpm recursive would descend into it.
+		pnpm recursive install --shamefully-hoist --filter '!./e2e'
 		echo "--------------------------------------------------"
 		echo "Running node build (if present)"
-		pnpm recursive run --if-present build
+		pnpm recursive run --if-present --filter '!./e2e' build
 		echo "--------------------------------------------------"
 		echo "Running node test (if present)"
-		pnpm recursive run --if-present test
+		pnpm recursive run --if-present --filter '!./e2e' test
 	elif [ "null" = "$(jq -cM '.workspaces' < package.json)" ]; then
 		echo "--------------------------------------------------"
 		echo "Installing node dependencies"
