@@ -34,11 +34,11 @@ else
 fi
 
 if [ -f 'package.json' ]; then
-	if [ -f 'pnpm-lock.yaml' ]; then
+	if [ -f 'pnpm-lock.yaml' ] && [ -f 'pnpm-workspace.yaml' ]; then
 		echo "--------------------------------------------------"
-		echo "Installing node dependencies"
+		echo "Installing node dependencies (the root + the packages pnpm-workspace.yaml lists)"
 		# e2e/ is the site's Playwright suite, a package of its own: never installed, built or run on
-		# deploy. Without a pnpm-workspace.yaml, pnpm recursive would descend into it.
+		# deploy, even if a workspace glob happens to cover it.
 		pnpm recursive install --shamefully-hoist --filter '!./e2e'
 		echo "--------------------------------------------------"
 		echo "Running node build (if present)"
@@ -46,6 +46,20 @@ if [ -f 'package.json' ]; then
 		echo "--------------------------------------------------"
 		echo "Running node test (if present)"
 		pnpm recursive run --if-present --filter '!./e2e' test
+	elif [ -f 'pnpm-lock.yaml' ]; then
+		# No pnpm-workspace.yaml: the root project only. Without the file `pnpm recursive` takes every
+		# package.json in the tree as a project (pattern "**"), composer-installed plugins and
+		# server-derived code included, and runs their scripts with this job's secrets. The workspace
+		# file is the list of packages allowed to build.
+		echo "--------------------------------------------------"
+		echo "Installing node dependencies (root only: no pnpm-workspace.yaml lists other packages)"
+		pnpm install --shamefully-hoist
+		echo "--------------------------------------------------"
+		echo "Running node build (if present)"
+		pnpm run --if-present build
+		echo "--------------------------------------------------"
+		echo "Running node test (if present)"
+		pnpm run --if-present test
 	elif [ "null" = "$(jq -cM '.workspaces' < package.json)" ]; then
 		echo "--------------------------------------------------"
 		echo "Installing node dependencies"

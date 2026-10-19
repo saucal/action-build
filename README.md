@@ -49,3 +49,9 @@ This should be compatible with any codebase structure, but it has been tested wi
     # back to a pruned `find` if `path` is not a git checkout.
     manifest_list: ""
 ```
+
+## Which node packages build
+
+- **npm:** `npm ci` + `build` / `test` at the root, or `npm -ws` over the `workspaces` globs in `package.json`.
+- **pnpm:** `pnpm-workspace.yaml` is the list of packages allowed to build. With it, the root and the packages it lists are installed, built and tested. Without it, only the root is: `pnpm recursive` with no workspace file would treat every `package.json` in the tree as a project (composer-installed plugins and code copied from a server included) and run its scripts with the job's secrets. List only the repo's own plugins and themes, never composer-installed ones.
+- `e2e/` (the site's Playwright suite) is never installed, built or tested on deploy.

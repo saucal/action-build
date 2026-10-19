@@ -31,6 +31,8 @@ for v in 6 10; do
 		printf '%s' "$out" | grep -qE 'E2E-(PREINSTALL|BUILD|TEST)' && say "pnpm $v $mode: the build ran e2e/ scripts"
 		if [ "$mode" = plain ]; then
 			printf '%s' "$out" | grep -q ROOT-BUILD || say "pnpm $v plain: the root build no longer runs"
+			# No workspace file = no allowlist: a package.json elsewhere (a composer-installed plugin) never runs.
+			printf '%s' "$out" | grep -q PLUGIN-BUILD && say "pnpm $v plain: an unlisted plugins/ package was built"
 		else
 			printf '%s' "$out" | grep -q PLUGIN-BUILD || say "pnpm $v workspace: the workspace package no longer builds"
 		fi
@@ -43,5 +45,5 @@ d="$T/npm"; fixture "$d"; rm -rf "$d/plugins"
 out="$(cd "$d" && bash "$ROOT/build-for-deployment.sh" 2>&1)" || say "npm: the build failed: $(printf '%s' "$out" | tail -n 3)"
 printf '%s' "$out" | grep -qE 'E2E-(PREINSTALL|BUILD|TEST)' && say "npm: the build ran e2e/ scripts"
 
-[ "$fail" -eq 0 ] && echo "PASS: e2e/ stays out of deploy builds"
+[ "$fail" -eq 0 ] && echo "PASS: e2e/ and packages pnpm-workspace.yaml does not list stay out of deploy builds"
 exit "$fail"
